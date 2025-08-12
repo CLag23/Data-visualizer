@@ -1,6 +1,6 @@
 import java.util.Scanner;
-import java.util.ArrayList; // a dynamic array that can grow and shrink at runtime
-import java.util.List; // an interface that arrayList implements making the code more flexable if switch to different list implent
+import java.util.ArrayList;
+import java.util.List;
 public class DataVisualizer {
     private static final String STOP_INPUT = "-1";
     private static final String SEPARATOR = "-----------------------------------------";
@@ -11,10 +11,10 @@ public class DataVisualizer {
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Get headers form user
-        String title = getInput(scanner,"Enter a title for the dat:");
-        String columnOneHead = getInput(scanner, "Enter the colum 1 header;");
-        String columnTwoHead = getInput(scanner, "Enter the column 2 header");
+        // Get headers from user
+        String title = getInput(scanner, "Enter a title for the data: ");
+        String columnOneHead = getInput(scanner, "Enter the column 1 header:");
+        String columnTwoHead = getInput(scanner, "Enter the column 2 header:");
 
         // Collect data points
         List<String> dataNames = new ArrayList<>();
@@ -28,7 +28,7 @@ public class DataVisualizer {
 
     }
     // Gets input from user with a prompt
-    public static String getInput(Scanner scanner, String prompt) {
+    private static String getInput(Scanner scanner, String prompt) {
         System.out.println(prompt);
         return scanner.nextLine();
     }
@@ -39,14 +39,14 @@ public class DataVisualizer {
         System.out.println("Enter -1 to stop input\n");
 
         while (true) {
-            System.out.println("Enter a data: ");
+            System.out.println("Enter a data point: ");
             String dataPoint = scanner.nextLine();
 
             if (dataPoint.equals(STOP_INPUT)) {
                 break;
             }
 
-            if (ProcessDataPoint(dataPoint, names, values)) {
+            if (processDataPoint(dataPoint, names, values)) {
                 // show confirmation message
                 System.out.println("✓ Added: " + names.get(names.size() - 1) + " -> " + values.get(values.size()
                 - 1) + "\n");
@@ -58,32 +58,33 @@ public class DataVisualizer {
      * processes a single data point and adds it to the list if valid
      * returns true if valid, false if there was an error
      */
-    private static boolean ProcessDataPoint(String dataPoint, List<String> names, List<Integer> values) {
+    private static boolean processDataPoint(String dataPoint, List<String> names, List<Integer> values) {
         // validating comma count
         long commaCount = dataPoint.chars().filter(ch -> ch == ',').count();
 
         if (commaCount == 0) {
-            System.out.println("❌ Error: No commas found. please try again.\n");
+            System.out.println("❌ Error: No commas found. Please try again.\n");
             return false;
         }
 
         if (commaCount > 1 ) {
-            System.out.println("❌ Error: Too many commas found. please try again.\n");
+            System.out.println("❌ Error: Too many commas found. Please try again.\n");
             return false;
         }
 
         String[] parts = dataPoint.split(",");
         if (parts.length != 2) {
-            System.out.println("❌ Error: Invalid format. please try again.\n");
+            System.out.println("❌ Error: Invalid format. Please try again.\n");
             return false;
         }
 
         try {
-            String name = (parts[0].trim());
+            String name = parts[0].trim();
             int value = Integer.parseInt(parts[1].trim());
 
             if(name.isEmpty()) {
                 System.out.println("❌ Error: Name cannot be empty.\n");
+                return false;
             }
 
             if (value < 0) {
@@ -97,7 +98,7 @@ public class DataVisualizer {
             return true;
 
         } catch (NumberFormatException e) {
-            System.out.println("❌ Error: value must be an integer.\n");
+            System.out.println("❌ Error: Value must be an integer.\n");
             return false;
         }
 
@@ -125,7 +126,7 @@ public class DataVisualizer {
 
     // Displays data in table format
     private static void displayTable(String title, String columnOneHead, String columnTwoHead, List<String> names, List<Integer> values) {
-        System.out.printf("%-" + TITLE_WIDTH + "s%n", title);
+        System.out.printf("%" + TITLE_WIDTH + "s%n", title);
         System.out.printf("%-" + COLUMN_WIDTH + "s|%" + VALUE_WIDTH + "s%n", columnOneHead, columnTwoHead);
         System.out.println(SEPARATOR);
 
