@@ -111,7 +111,7 @@ public class DataVisualizer {
         }
 
         System.out.println("\n" + "=".repeat(50));
-        System.out.println("RESULTS");
+        System.out.printf("%25s%n","RESULTS");
         System.out.println("=".repeat(50));
 
         // Display table format
