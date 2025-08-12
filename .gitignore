@@ -3,4 +3,5 @@ out/production/Data-visualizer/.idea
 *.xml
 *.iml
 *.class
+*.gitattributes
 out
