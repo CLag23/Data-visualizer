@@ -7,106 +7,142 @@ public class DataVisualizer {
     private static final int TITLE_WIDTH = 35;
     private static final int COLUMN_WIDTH = 20;
     private static final int VALUE_WIDTH = 23;
+
     public static void main(String[] args) {
         Scanner scanner = new Scanner(System.in);
 
-        // Get headers
+        // Get headers form user
         String title = getInput(scanner,"Enter a title for the dat:");
         String columnOneHead = getInput(scanner, "Enter the colum 1 header;");
         String columnTwoHead = getInput(scanner, "Enter the column 2 header");
 
         // Collect data points
-        List<String> authorNames = new ArrayList<>();
-        List<Integer> novelCounts = new ArrayList<>();
-        collectDataPoints(scanner, dataName, dataValues);
+        List<String> dataNames = new ArrayList<>();
+        List<Integer> dataValues = new ArrayList<>();
+        collectDataPoints(scanner, dataNames, dataValues);
 
         // Display the results
+        displayResults(title, columnOneHead, columnTwoHead, dataNames, dataValues);
 
+        scanner.close();
 
+    }
+    // Gets input from user with a prompt
+    public static String getInput(Scanner scanner, String prompt) {
+        System.out.println(prompt);
+        return scanner.nextLine();
+    }
 
+    // Collects data points from user until they enter -1
+    private static void collectDataPoints(Scanner scanner, List<String> names, List<Integer> values) {
+        System.out.println("\nEnter data points in format: name,value");
+        System.out.println("Enter -1 to stop input\n");
 
+        while (true) {
+            System.out.println("Enter a data: ");
+            String dataPoint = scanner.nextLine();
 
-
-
-
-
-
-
-
-
-
-
-        String dataPoint; // holds user inputs
-        while (true) { // infinite loop to keep asking for data points until user types "-1" then breaks
-            System.out.println("Enter a data point (-1 to stop input):");
-            dataPoint = scanner.nextLine();
-
-
-            if (dataPoint.equals("-1")) {
+            if (dataPoint.equals(STOP_INPUT)) {
                 break;
             }
-            // validating - counts how many commas in input
-            /*
-            dataPoint.chars() converts the string into a stream of characters
-            .filter(ch -> ch == ',') filters the stream to only commas
-            .count(): counts how many commas are in the string
-            dataPoint.split(","): Splits the string at the comma into an array.
-            */
 
-            long commaCount = dataPoint.chars().filter(ch -> ch == ',').count();
-            if ( commaCount == 0) { // if 0 commas display error
-                System.out.println("Error: Too many commas in input." + "\n");
-                continue;
+            if (ProcessDataPoint(dataPoint, names, values)) {
+                // show confirmation message
+                System.out.println("✓ Added: " + names.get(names.size() - 1) + " -> " + values.get(values.size()
+                - 1) + "\n");
             }
+        }
+    }
 
-            String[] part = dataPoint.split(",");
-            if (part.length != 2) {
-                System.out.println("Error: No comma in string." + "\n");
-                continue;
-            }
+    /**
+     * processes a single data point and adds it to the list if valid
+     * returns true if valid, false if there was an error
+     */
+    private static boolean ProcessDataPoint(String dataPoint, List<String> names, List<Integer> values) {
+        // validating comma count
+        long commaCount = dataPoint.chars().filter(ch -> ch == ',').count();
 
-            try {
-                String name = part[0].trim(); // takes everything before the comma, remove extr spaces and stores it in "name"
-                int number = Integer.parseInt(part[1].trim()); // same goes from above but stores it in "number"
-
-                // stores data in ArrayList
-                authorNames.add(name);
-                novelCounts.add(number);
-
-                // displays what the user typed
-                System.out.println("Data string: " + name);
-                System.out.println("Data integer: " + number + "\n");
-            // it Integer.pareInt() fails (user types a non-integer) display error message.
-            } catch (Exception ex) {
-                System.out.println("Error: Comma not followed by an integer.\n");
-            }
-
+        if (commaCount == 0) {
+            System.out.println("❌ Error: No commas found. please try again.\n");
+            return false;
         }
 
-        /*
-        %33s right justify the title within 33 spaces and %n newLine
-        %-20s: Left-justify the first column within 20 spaces.
-        |: A literal vertical bar in the middle as a column separator.
-        Right-justify the second column within 23 spaces.
-         */
+        if (commaCount > 1 ) {
+            System.out.println("❌ Error: Too many commas found. please try again.\n");
+            return false;
+        }
+
+        String[] parts = dataPoint.split(",");
+        if (parts.length != 2) {
+            System.out.println("❌ Error: Invalid format. please try again.\n");
+            return false;
+        }
+
+        try {
+            String name = (parts[0].trim());
+            int value = Integer.parseInt(parts[1].trim());
+
+            if(name.isEmpty()) {
+                System.out.println("❌ Error: Name cannot be empty.\n");
+            }
+
+            if (value < 0) {
+                System.out.println("❌ Error: Value cannot be negative.\n");
+                return false;
+            }
+
+            names.add(name);
+            values.add(value);
+
+            return true;
+
+        } catch (NumberFormatException e) {
+            System.out.println("❌ Error: value must be an integer.\n");
+            return false;
+        }
+
+    }
+    // Displays the formatted results in both table and chart format
+    private static void displayResults(String title, String columnOneHead, String columnTwoHead, List<String> names, List<Integer> values) {
+        if (names.isEmpty()) {
+            System.out.println("No data points to display.");
+            return;
+        }
+
+        System.out.println("\n" + "=".repeat(50));
+        System.out.println("RESULTS");
+        System.out.println("=".repeat(50));
+
+        // Display table format
+        displayTable(title, columnOneHead, columnTwoHead, names, values);
+
         System.out.println();
-        System.out.printf("%33s%n", titleData);
-        System.out.printf("%-20s|%23s%n", columnOneHead, columnTwoHead);
-        System.out.println("--------------------------------------------");
 
-        /*
-        Loop through each author and their novel count.
-        "*".repeat(novelCounts.get(i)): Create a string of * repeated novelCounts.get(i) times (the integer we stored).
-         */
+        // Display chart format
+        displayChart(names, values);
 
-        for (int i = 0; i < authorNames.size(); i++) {
-            System.out.printf("%-20s|%23s%n", authorNames.get(i), novelCounts.get(i));
+    }
+
+    // Displays data in table format
+    private static void displayTable(String title, String columnOneHead, String columnTwoHead, List<String> names, List<Integer> values) {
+        System.out.printf("%-" + TITLE_WIDTH + "s%n", title);
+        System.out.printf("%-" + COLUMN_WIDTH + "s|%" + VALUE_WIDTH + "s%n", columnOneHead, columnTwoHead);
+        System.out.println(SEPARATOR);
+
+        for (int i = 0; i < names.size(); i++) {
+            System.out.printf("%-" + COLUMN_WIDTH + "s|%" + VALUE_WIDTH + "s%n", names.get(i), values.get(i));
         }
-        System.out.println();
-        for (int i = 0; i < authorNames.size(); i++) {
-            System.out.printf("%20s %s%n", authorNames.get(i),"*".repeat(novelCounts.get(i)));
+    }
+
+    // Displays data in horizontal bar chart format
+    private static void displayChart(List<String> names, List<Integer> values) {
+        System.out.println("VISUAL CHART:");
+        System.out.println("-".repeat(40));
+
+        for (int i = 0; i < names.size(); i++) {
+            String stars = "★".repeat(values.get(i));
+            System.out.printf("%-" + COLUMN_WIDTH + "s %s (%d)%n", names.get(i), stars, values.get(i));
 
         }
-
     }
 }
