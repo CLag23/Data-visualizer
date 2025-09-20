@@ -1,10 +1,10 @@
 ## <span style="color:#dfe1e5">Description</span>
-A command-line tool that allows users to input name-value pairs and automatically generates two types of visual representations.
+A command line tool that allows users to input name value pairs and automatically generates two types of visual representations.
 - Formatted Table: Tabular display
 - Horizontal Bar Chart: Visual representation using star symbols (★)
 
 ## <span style="color:#dfe1e5">Features</span>
-- Interactive Data Entry: Comma-separated input format (`name, value`)
+- Interactive Data Entry: Comma separated input format (`name, value`)
 - Input validation: Error handling for invalid formats, empty names, and negative values
 - Clean Formatting: Output with proper alignment and separators;
 
